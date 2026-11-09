@@ -38,7 +38,7 @@ export interface ShellProps {
 }
 
 const NAV = [
-  { href: "/", label: "Overview", icon: LayoutDashboard },
+  { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/command", label: "AI Command Center", icon: Sparkles },
   { href: "/invoices", label: "Invoices", icon: FileText },
   { href: "/autopilot", label: "Autopilot", icon: Bot },
@@ -90,7 +90,7 @@ export function AppShell({ user, modes, approvals, manualReviews, showTour, user
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const notifCount = approvals.length + (manualReviews > 0 ? 1 : 0);
   const anyDemo = modes.paypal === "demo" || modes.data === "demo" || modes.ai === "demo";
 

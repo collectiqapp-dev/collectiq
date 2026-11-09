@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "local";
   if (!rateLimit(`signup:${ip}`, 5, 60_000).ok) return jsonError("Too many attempts. Try again shortly.", 429, "rate_limited");
   const sb = await supabaseForRequest();
-  const { data, error } = await sb.auth.signUp({ ...parsed.data, options: { emailRedirectTo: `${env.appUrl}/` } });
+  const { data, error } = await sb.auth.signUp({ ...parsed.data, options: { emailRedirectTo: `${env.appUrl}/overview` } });
   if (error) return jsonError(error.message, 400, "signup_failed");
   return NextResponse.json({ ok: true, needsConfirmation: !data.session });
 }

@@ -134,7 +134,7 @@ export function DemoDataControls({ dataMode }: { dataMode: string }) {
                   const r = await run("reset", "/api/demo/reset", {}, { refresh: false });
                   if (r) {
                     toast.success("Demo database reset");
-                    router.push("/");
+                    router.push("/overview");
                     router.refresh();
                   }
                 }}
@@ -160,7 +160,7 @@ export function RestartTourButton({ userId }: { userId: string }) {
           localStorage.removeItem(`ciq-tour-done-${userId}`);
         } catch {}
         await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tour_completed: false }) }).catch(() => {});
-        router.push("/");
+        router.push("/overview");
         router.refresh();
       }}
     >

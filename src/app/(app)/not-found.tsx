@@ -10,7 +10,7 @@ export default function NotFound() {
         description="That record doesn't exist or belongs to another account."
         action={
           <Button asChild>
-            <Link href="/">Back to overview</Link>
+            <Link href="/overview">Back to overview</Link>
           </Button>
         }
       />

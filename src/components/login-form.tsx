@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, Field, Input } from "@/components/ui/primitives";
 import { apiFetch } from "@/components/use-api";
 
-export function LoginForm() {
+export function LoginForm({ initialMode = "login" }: { initialMode?: "login" | "signup" }) {
   const router = useRouter();
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,13 +23,13 @@ export function LoginForm() {
     try {
       if (mode === "login") {
         await apiFetch("/api/auth/login", { email, password });
-        router.push("/");
+        router.push("/overview");
         router.refresh();
       } else {
         const r = await apiFetch<{ needsConfirmation: boolean }>("/api/auth/signup", { email, password });
         if (r.needsConfirmation) setInfo("Check your email to confirm your account, then sign in.");
         else {
-          router.push("/");
+          router.push("/overview");
           router.refresh();
         }
       }

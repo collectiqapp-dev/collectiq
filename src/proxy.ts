@@ -23,7 +23,13 @@ export async function proxy(request: NextRequest) {
   });
   const { data } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  const isPublic = path.startsWith("/login") || path.startsWith("/api/");
+  const isPublic = path === "/" || path.startsWith("/login") || path.startsWith("/api/");
+  if (data.user && path.startsWith("/login")) {
+    const to = request.nextUrl.clone();
+    to.pathname = "/overview";
+    to.search = "";
+    return NextResponse.redirect(to);
+  }
   if (!data.user && !isPublic) {
     const to = request.nextUrl.clone();
     to.pathname = "/login";
@@ -33,5 +39,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|ico|csv)$).*)"],
 };
