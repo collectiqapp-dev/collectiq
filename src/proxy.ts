@@ -4,9 +4,9 @@ import { type NextRequest, NextResponse } from "next/server";
 // Refreshes the Supabase auth session cookie and redirects signed-out users to
 // /login. In demo mode (no Supabase configured) it is a pass-through.
 export async function proxy(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key || !process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.next();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+  if (!url || !key || !process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) return NextResponse.next();
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(url, key, {

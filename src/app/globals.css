@@ -2,67 +2,68 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* COLLECTIQ design tokens: navy/charcoal foundation, slate surfaces,
-   emerald primary, soft blue secondary. */
+/* COLLECTIQ brand tokens (brand guide): Primary #10B981, Primary Dark #059669,
+   Secondary #3B82F6, Background #0B1220, Surface #111827, Border #1F2937,
+   Text #E5E7EB / #94A3B8, Warning #F59E0B, Error #EF4444. Dark is the brand's
+   native theme; light mode keeps the same accents on slate surfaces. */
 :root {
-  --background: #f6f7f9;
-  --foreground: #0f172a;
+  --background: #f5f7fa;
+  --foreground: #0b1220;
   --card: #ffffff;
-  --card-foreground: #0f172a;
-  --muted: #eef1f5;
-  --muted-foreground: #5b6578;
-  --border: #e2e6ec;
-  --input: #d7dce4;
+  --card-foreground: #0b1220;
+  --muted: #eef2f6;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #cbd5e1;
   --primary: #059669;
   --primary-foreground: #ffffff;
-  --primary-soft: #e7f6f0;
+  --primary-soft: #e6f7f0;
   --secondary: #3b82f6;
   --secondary-soft: #eaf2fe;
-  --success: #16a34a;
-  --success-soft: #e9f7ee;
+  --success: #059669;
+  --success-soft: #e6f7f0;
   --warning: #d97706;
   --warning-soft: #fdf4e3;
-  --danger: #dc2626;
+  --danger: #ef4444;
   --danger-soft: #fdecec;
   --sidebar: #0b1220;
-  --sidebar-foreground: #c9d2e3;
-  --sidebar-muted: #7b879c;
-  --sidebar-active: #16213a;
+  --sidebar-foreground: #e5e7eb;
+  --sidebar-muted: #94a3b8;
+  --sidebar-active: #111827;
   --ring: #10b981;
   --chart-1: #10b981;
-  --chart-2: #60a5fa;
+  --chart-2: #3b82f6;
   --chart-3: #f59e0b;
   --chart-4: #f97316;
   --chart-5: #ef4444;
 }
 
 .dark {
-  --background: #0a0f1a;
-  --foreground: #e6ebf3;
+  --background: #0b1220;
+  --foreground: #e5e7eb;
   --card: #111827;
-  --card-foreground: #e6ebf3;
-  --muted: #172033;
-  --muted-foreground: #95a1b6;
-  --border: #1f2a3d;
-  --input: #2a364c;
+  --card-foreground: #e5e7eb;
+  --muted: #1a2332;
+  --muted-foreground: #94a3b8;
+  --border: #1f2937;
+  --input: #2b3648;
   --primary: #10b981;
   --primary-foreground: #04120c;
   --primary-soft: #0c2a22;
-  --secondary: #60a5fa;
+  --secondary: #3b82f6;
   --secondary-soft: #13233d;
-  --success: #22c55e;
-  --success-soft: #0f2a1b;
+  --success: #10b981;
+  --success-soft: #0c2a22;
   --warning: #f59e0b;
   --warning-soft: #2c2210;
-  --danger: #f87171;
+  --danger: #ef4444;
   --danger-soft: #2f1517;
-  --sidebar: #070b14;
-  --sidebar-foreground: #c9d2e3;
-  --sidebar-muted: #6f7b90;
-  --sidebar-active: #121b2e;
-  --ring: #34d399;
+  --sidebar: #0b1220;
+  --sidebar-foreground: #e5e7eb;
+  --sidebar-muted: #94a3b8;
+  --sidebar-active: #111827;
+  --ring: #10b981;
 }
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -88,7 +89,7 @@
   --color-sidebar-muted: var(--sidebar-muted);
   --color-sidebar-active: var(--sidebar-active);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --radius-sm: 8px;
   --radius-md: 10px;

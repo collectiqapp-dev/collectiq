@@ -81,7 +81,7 @@ export default async function OverviewPage() {
         <p className="mt-2 text-xs text-muted-foreground">Totals are in {cur}. Invoices in {[...otherCurrencies].join(", ")} are not converted and are excluded.</p>
       )}
 
-      <Card className="mt-4 border-primary/25 bg-primary-soft/40">
+      <Card className="mt-3 border-primary/25 bg-primary-soft/40">
         <CardContent className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
           <Sparkles className="size-5 shrink-0 text-primary" />
           <p className="flex-1 text-sm leading-relaxed">{factualSummary(s, f)}</p>
@@ -93,7 +93,7 @@ export default async function OverviewPage() {
         </CardContent>
       </Card>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <div className="mt-3 grid gap-3 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
             <div>
@@ -121,7 +121,7 @@ export default async function OverviewPage() {
         </Card>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <div className="mt-3 grid gap-3 lg:grid-cols-3">
         <Card className="lg:col-span-2" id="approvals">
           <CardHeader>
             <div>
@@ -178,7 +178,7 @@ export default async function OverviewPage() {
         </Card>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <div>

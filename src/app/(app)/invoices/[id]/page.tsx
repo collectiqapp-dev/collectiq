@@ -55,7 +55,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
       <Link href="/invoices" className="mb-4 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-3.5" /> Invoices
       </Link>
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl font-semibold tracking-tight">{invoice.invoice_number}</h1>
@@ -89,8 +89,8 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="flex flex-col gap-4 lg:col-span-2">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <div className="flex flex-col gap-3 lg:col-span-2">
           <Card>
             <CardContent className="pt-5">
               <div className="grid gap-6 sm:grid-cols-2">
@@ -176,7 +176,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           </Card>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <Card>
             <CardHeader>
               <CardTitle>PayPal</CardTitle>

@@ -4,8 +4,6 @@ import {
   Activity,
   Bell,
   Bot,
-  ChevronsLeft,
-  ChevronsRight,
   FileText,
   FlaskConical,
   LayoutDashboard,
@@ -24,6 +22,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { DropdownMenu } from "radix-ui";
 import { useEffect, useRef, useState } from "react";
+import { LogoMark, Wordmark } from "@/components/brand";
 import { Badge } from "@/components/ui/primitives";
 import { cn } from "@/lib/utils";
 
@@ -48,22 +47,19 @@ const NAV = [
 
 function Logo({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className="flex items-center gap-2.5 px-1">
-      <div className="grid size-8 place-items-center rounded-[10px] bg-emerald-500 text-[13px] font-bold text-slate-950">CQ</div>
-      {!collapsed && (
-        <div className="leading-tight">
-          <div className="text-sm font-semibold tracking-wide text-white">COLLECTIQ</div>
-          <div className="text-[10px] text-sidebar-muted">Get paid, on autopilot</div>
-        </div>
-      )}
+    <div className="flex h-9 items-center gap-2.5 overflow-hidden pl-[6px]">
+      <LogoMark />
+      <div className={cn("leading-tight whitespace-nowrap transition-opacity duration-150", collapsed ? "opacity-0" : "opacity-100")}>
+        <Wordmark className="text-sm text-white" />
+        <div className="text-[10px] text-sidebar-muted">Let your agent get you paid</div>
+      </div>
     </div>
   );
 }
-
 export function AppShell({ user, modes, approvals, manualReviews, children }: ShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -72,9 +68,7 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
 
   useEffect(() => {
     setMounted(true);
-    try {
-      setCollapsed(localStorage.getItem("ciq-sidebar") === "collapsed");
-    } catch {}
+
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -86,15 +80,6 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
   }, []);
 
   useEffect(() => setMobileOpen(false), [pathname]);
-
-  const toggleCollapsed = () => {
-    setCollapsed((c) => {
-      try {
-        localStorage.setItem("ciq-sidebar", c ? "expanded" : "collapsed");
-      } catch {}
-      return !c;
-    });
-  };
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
   const notifCount = approvals.length + (manualReviews > 0 ? 1 : 0);
@@ -109,15 +94,15 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
           title={isCollapsed ? label : undefined}
           aria-current={isActive(href) ? "page" : undefined}
           className={cn(
-            "flex items-center gap-3 rounded-[10px] px-2.5 py-2 text-[13px] font-medium text-sidebar-foreground/85 transition-colors hover:bg-sidebar-active hover:text-white",
+            "relative flex items-center gap-3 rounded-[10px] px-[13px] py-2 text-[13px] font-medium text-sidebar-foreground/85 transition-colors hover:bg-sidebar-active hover:text-white",
             isActive(href) && "bg-sidebar-active text-white",
-            isCollapsed && "justify-center px-0",
+
           )}
         >
           <Icon className={cn("size-[18px] shrink-0", isActive(href) ? "text-emerald-400" : "text-sidebar-muted")} />
-          {!isCollapsed && <span className="truncate">{label}</span>}
-          {!isCollapsed && href === "/autopilot" && approvals.length > 0 ? (
-            <span className="ml-auto rounded-full bg-amber-500/15 px-1.5 text-[10px] font-semibold text-amber-400">{approvals.length}</span>
+          <span className={cn("truncate whitespace-nowrap transition-opacity duration-150", isCollapsed && "opacity-0")}>{label}</span>
+          {href === "/autopilot" && approvals.length > 0 ? (
+            <span className={cn("ml-auto rounded-full bg-amber-500/15 px-1.5 text-[10px] font-semibold text-amber-400", isCollapsed && "absolute left-8 top-1 ml-0 px-1")}>{approvals.length}</span>
           ) : null}
         </Link>
       ))}
@@ -126,21 +111,23 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
 
   return (
     <div className="flex min-h-dvh">
-      {/* Desktop sidebar */}
-      <aside className={cn("sticky top-0 hidden h-dvh shrink-0 flex-col gap-6 bg-sidebar p-3 md:flex transition-[width]", collapsed ? "w-[68px]" : "w-60")}>
-        <div className="flex items-center justify-between pt-1">
-          <Logo collapsed={collapsed} />
-        </div>
-        {nav(collapsed)}
-        <button
-          onClick={toggleCollapsed}
-          className="flex items-center gap-2 rounded-[10px] px-2.5 py-2 text-xs text-sidebar-muted hover:bg-sidebar-active hover:text-white"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <ChevronsRight className="mx-auto size-4" /> : <><ChevronsLeft className="size-4" /> Collapse</>}
-        </button>
+      {/* Desktop sidebar: always collapsed to icons; expands over the content on hover or keyboard focus. */}
+      <div className="hidden w-16 shrink-0 md:block" aria-hidden />
+      <aside
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) setHovered(false);
+        }}
+        className={cn(
+          "fixed left-0 top-0 z-40 hidden h-dvh flex-col gap-5 overflow-hidden bg-sidebar px-2 py-3 transition-[width,box-shadow] duration-200 md:flex",
+          hovered ? "w-60 shadow-2xl shadow-black/40" : "w-16",
+        )}
+      >
+        <Logo collapsed={!hovered} />
+        {nav(!hovered)}
       </aside>
-
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
@@ -172,7 +159,7 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
             </Link>
           </div>
         )}
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur md:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur md:px-5">
           <button onClick={() => setMobileOpen(true)} className="rounded-md p-1.5 hover:bg-muted md:hidden" aria-label="Open menu">
             <Menu className="size-5" />
           </button>
@@ -276,7 +263,7 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
             </DropdownMenu.Root>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-6 md:px-8 md:py-8">{children}</main>
+        <main className="w-full flex-1 px-4 py-4 md:px-5 md:py-5 2xl:px-6">{children}</main>
       </div>
     </div>
   );

@@ -52,7 +52,7 @@ export default async function InsightsPage() {
         ))}
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <div>

@@ -42,7 +42,7 @@ export default async function AutopilotPage() {
     <>
       <PageHeader title="Collection Autopilot" description="Policies decide what should happen. The permission service decides what may happen. PayPal executes. Everything is logged." actions={<RunAutopilotButton />} />
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
             <div className="flex items-start gap-3">
@@ -114,7 +114,7 @@ export default async function AutopilotPage() {
         </Card>
       </div>
 
-      <Card className="mt-4" id="approvals">
+      <Card className="mt-3" id="approvals">
         <CardHeader>
           <div>
             <CardTitle>Approval queue</CardTitle>
@@ -131,7 +131,7 @@ export default async function AutopilotPage() {
         </CardContent>
       </Card>
 
-      <div className="mt-6 mb-3 flex items-center justify-between">
+      <div className="mt-5 mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold">Collection policies</h2>
         <PolicyEditor
           trigger={
@@ -146,7 +146,7 @@ export default async function AutopilotPage() {
           <EmptyState title="No policies" description="Create a policy to automate reminders." />
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-2">
           {policies.map((p) => (
             <Card key={p.id}>
               <CardHeader>

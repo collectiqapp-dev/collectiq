@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppearanceToggle } from "@/components/appearance-toggle";
 import { AutonomyForm, DemoDataControls, ProfileForm, TestPayPalButton } from "@/components/settings-forms";
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from "@/components/ui/primitives";
 import { env, integrationModes } from "@/lib/env";
@@ -20,7 +21,7 @@ export default async function SettingsPage() {
   return (
     <>
       <PageHeader title="Settings" />
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         <Card>
           <CardHeader>
             <div>
@@ -30,6 +31,18 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent>
             <ProfileForm profile={profile} />
+          </CardContent>
+        </Card>
+
+        <Card id="appearance">
+          <CardHeader>
+            <div>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>Dark is COLLECTIQ&apos;s default theme. Your choice applies to every page on this device.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <AppearanceToggle />
           </CardContent>
         </Card>
 
@@ -52,7 +65,7 @@ export default async function SettingsPage() {
               <CardDescription>Status reflects the server&apos;s environment variables. Secrets are never shown or sent to the browser.</CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="grid gap-4">
+          <CardContent className="grid gap-3">
             <div className="rounded-[12px] border border-border p-3">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-medium">PayPal Invoicing</span>

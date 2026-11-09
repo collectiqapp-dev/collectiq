@@ -46,7 +46,7 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
       <Link href="/clients" className="mb-4 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-3.5" /> Clients
       </Link>
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl font-semibold tracking-tight">{client.name}</h1>
@@ -90,7 +90,7 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
         ))}
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <div className="mt-3 grid gap-3 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
             <div>
@@ -125,7 +125,7 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
             )}
           </CardContent>
         </Card>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <Card>
             <CardHeader>
               <CardTitle>Collection policies</CardTitle>
@@ -153,7 +153,7 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
           </Card>
         </div>
       </div>
-      <Card className="mt-4">
+      <Card className="mt-3">
         <CardHeader>
           <div>
             <CardTitle>Communication history</CardTitle>
