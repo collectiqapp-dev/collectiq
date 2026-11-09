@@ -171,11 +171,31 @@ export async function executeTool(ctx: ServiceContext, name: string, rawInput: u
 
     case "get_collection_summary": {
       const profile = await ctx.db.profile();
-      const s = computeSummary(await ctx.db.list("invoices"), clients, ctx.now(), profile.default_currency);
+      const allInvoices = await ctx.db.list("invoices");
+      // Report every currency the user bills in. Amounts are never converted.
+      const counts = new Map<string, number>();
+      for (const i of allInvoices) counts.set(i.currency, (counts.get(i.currency) ?? 0) + 1);
+      const primary = counts.has(profile.default_currency) || counts.size === 0
+        ? profile.default_currency
+        : [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+      const s = computeSummary(allInvoices, clients, ctx.now(), primary);
       const fmt = (c: number) => formatMoney(c, s.currency);
+      const others = [...counts.keys()].filter((c) => c !== primary).map((cur) => {
+        const o = computeSummary(allInvoices, clients, ctx.now(), cur);
+        const f = (c: number) => formatMoney(c, cur);
+        return { currency: cur, outstanding: f(o.outstandingCents), overdue: f(o.overdueCents), due_next_30_days: f(o.expectedNext30Cents), collected_this_month: f(o.collectedThisMonthCents) };
+      });
       return {
         result: {
           currency: s.currency,
+          reporting_currency_setting: profile.default_currency,
+          currency_note:
+            primary !== profile.default_currency
+              ? `The user's reporting currency is ${profile.default_currency}, but they have no ${profile.default_currency} invoices, so figures are shown in ${primary}, the currency of their invoices. No conversion was done.`
+              : others.length
+                ? `Figures are in ${primary}. Invoices in other currencies are listed separately in other_currencies and were not converted.`
+                : undefined,
+          other_currencies: others.length ? others : undefined,
           factual_summary: factualSummary(s, fmt),
           outstanding: fmt(s.outstandingCents),
           outstanding_invoices: s.outstandingCount,

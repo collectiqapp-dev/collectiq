@@ -8,7 +8,7 @@ import { InvoiceStatusBadge } from "@/components/status";
 import { Button } from "@/components/ui/button";
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from "@/components/ui/primitives";
 import { addDays, formatDate, todayISO } from "@/lib/dates";
-import { AGING_LABELS, type AgingBucket, computeSummary, effectiveStatus, factualSummary } from "@/lib/metrics";
+import { AGING_LABELS, type AgingBucket, computeSummary, reportingCurrency, effectiveStatus, factualSummary } from "@/lib/metrics";
 import { formatMoney } from "@/lib/money";
 import { getSession } from "@/lib/server";
 
@@ -24,7 +24,7 @@ export default async function OverviewPage() {
     ctx.db.list("agent_activity", undefined, { orderBy: "created_at", ascending: false, limit: 40 }),
     ctx.db.list("approvals", { status: "pending" }, { orderBy: "created_at", ascending: false }),
   ]);
-  const cur = profile.default_currency;
+  const cur = reportingCurrency(invoices, profile.default_currency);
   const s = computeSummary(invoices, clients, new Date(), cur);
   const f = (c: number) => formatMoney(c, cur);
   const today = todayISO();

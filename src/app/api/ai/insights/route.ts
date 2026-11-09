@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { env, integrationModes } from "@/lib/env";
 import { log } from "@/lib/logger";
-import { computeSummary, factualSummary } from "@/lib/metrics";
+import { computeSummary, factualSummary, reportingCurrency } from "@/lib/metrics";
 import { formatMoney } from "@/lib/money";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiRoute, jsonError } from "@/lib/server";
@@ -11,7 +11,8 @@ import { apiRoute, jsonError } from "@/lib/server";
 export const POST = apiRoute(async (_req, { ctx, profile, user }) => {
   const rl = rateLimit(`insights:${user.id}`, 6, 60_000);
   if (!rl.ok) return jsonError(`Please wait ${rl.retryAfterSec}s.`, 429, "rate_limited");
-  const s = computeSummary(await ctx.db.list("invoices"), await ctx.db.list("clients"), new Date(), profile.default_currency);
+  const invoices = await ctx.db.list("invoices");
+  const s = computeSummary(invoices, await ctx.db.list("clients"), new Date(), reportingCurrency(invoices, profile.default_currency));
   const f = (c: number) => formatMoney(c, s.currency);
   const base = factualSummary(s, f);
   if (integrationModes().ai !== "claude") {

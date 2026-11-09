@@ -6,7 +6,7 @@ import { InvoiceStatusBadge } from "@/components/status";
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from "@/components/ui/primitives";
 import { daysBetween, formatDate, todayISO } from "@/lib/dates";
 import { integrationModes } from "@/lib/env";
-import { AGING_LABELS, type AgingBucket, computeSummary, effectiveStatus, factualSummary } from "@/lib/metrics";
+import { AGING_LABELS, type AgingBucket, computeSummary, reportingCurrency, effectiveStatus, factualSummary } from "@/lib/metrics";
 import { formatMoney } from "@/lib/money";
 import { getSession } from "@/lib/server";
 
@@ -17,7 +17,7 @@ export default async function InsightsPage() {
   if (!session) return null;
   const { ctx, profile } = session;
   const [invoices, clients] = await Promise.all([ctx.db.list("invoices"), ctx.db.list("clients")]);
-  const cur = profile.default_currency;
+  const cur = reportingCurrency(invoices, profile.default_currency);
   const s = computeSummary(invoices, clients, new Date(), cur);
   const f = (c: number) => formatMoney(c, cur);
   const today = todayISO();

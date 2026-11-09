@@ -18,6 +18,17 @@ export function isOpen(inv: Invoice) {
   return OPEN.has(inv.status) && inv.amount_due_cents > 0;
 }
 
+/**
+ * Currency to report in: the user's setting if they have invoices in it,
+ * otherwise the currency most of their invoices use. Never converts amounts.
+ */
+export function reportingCurrency(invoices: Pick<Invoice, "currency">[], preferred: string): string {
+  const counts = new Map<string, number>();
+  for (const i of invoices) counts.set(i.currency, (counts.get(i.currency) ?? 0) + 1);
+  if (counts.size === 0 || counts.has(preferred)) return preferred;
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
 export type AgingBucket = "current" | "1-7" | "8-14" | "15-30" | "30+";
 export const AGING_LABELS: Record<AgingBucket, string> = {
   current: "Current",
