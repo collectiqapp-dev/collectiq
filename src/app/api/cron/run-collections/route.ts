@@ -18,10 +18,15 @@ function authorized(req: Request): boolean {
 }
 
 /**
- * Scheduled collection run for every user. Trigger from a Render Cron Job:
- *   curl -X POST -H "Authorization: Bearer $CRON_SECRET" $APP_URL/api/cron/run-collections
+ * Scheduled collection run for every user.
+ *  - Vercel Cron calls GET with "Authorization: Bearer $CRON_SECRET" automatically (see vercel.json).
+ *  - Any other scheduler can POST:
+ *    curl -X POST -H "Authorization: Bearer $CRON_SECRET" $APP_URL/api/cron/run-collections
  */
-export async function POST(req: Request) {
+export const GET = run;
+export const POST = run;
+
+async function run(req: Request) {
   if (!env.cronSecret) return jsonError("CRON_SECRET is not configured", 503, "cron_not_configured");
   if (!authorized(req)) return jsonError("Unauthorized", 401, "unauthorized");
 

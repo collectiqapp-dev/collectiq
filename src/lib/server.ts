@@ -19,7 +19,9 @@ export const DEMO_USER_ID = "00000000-0000-4000-8000-000000000001";
 
 const g = globalThis as unknown as { __ciqDemoStore?: MemoryStore };
 export function demoStore(): MemoryStore {
-  g.__ciqDemoStore ??= new MemoryStore(path.join(/*turbopackIgnore: true*/ process.cwd(), ".data", "demo-db.json"));
+  // Serverless hosts (Vercel) only allow writes under /tmp; data there is ephemeral by design.
+  const dir = process.env.VERCEL ? "/tmp" : path.join(/*turbopackIgnore: true*/ process.cwd(), ".data");
+  g.__ciqDemoStore ??= new MemoryStore(path.join(/*turbopackIgnore: true*/ dir, "demo-db.json"));
   return g.__ciqDemoStore;
 }
 

@@ -70,6 +70,14 @@ Verified on 2026-11-09 against the PayPal Sandbox: connection test, invoice crea
 | `npm run lint` | ESLint |
 | `npm test` | Vitest suite (63 tests: lifecycle, policy engine, permissions, scheduler, webhooks, PayPal client, AI intent) |
 
+## Deploying to Vercel
+
+1. Import the GitHub repo at https://vercel.com/new (framework preset: Next.js, defaults are fine).
+2. Before the first deploy, add the environment variables from `.env.example` under **Settings → Environment Variables**: the PayPal, Supabase and Anthropic values, plus `CRON_SECRET` (any long random string) and `APP_URL` (your `https://<project>.vercel.app` URL). Supabase is required on Vercel: without it the app falls back to the demo store in `/tmp`, which resets between requests.
+3. Deploy. `vercel.json` registers a daily Vercel Cron job (14:00 UTC, the Hobby-plan limit) that calls `GET /api/cron/run-collections` with `Authorization: Bearer $CRON_SECRET`. On Pro you can make it hourly.
+4. In Supabase → **Authentication → URL Configuration**, set the Site URL to your Vercel URL.
+5. In the PayPal developer app, add a webhook to `https://<project>.vercel.app/api/webhooks/paypal` (INVOICING.INVOICE.* events), copy the Webhook ID into `PAYPAL_WEBHOOK_ID`, and redeploy.
+
 ## Deploying to Render
 
 `render.yaml` defines a web service and an hourly cron job. Create a Blueprint from the repo, then fill in the secret environment variables in the Render dashboard (`APP_URL` on both services). See [docs/TECHNICAL_ARCHITECTURE.md](docs/TECHNICAL_ARCHITECTURE.md#deployment-on-render).
