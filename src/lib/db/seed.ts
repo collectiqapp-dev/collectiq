@@ -102,7 +102,8 @@ export async function seedDemoData(db: UserDb, now = new Date()) {
       collection_paused: false,
       dispute_open: false,
       paypal_mode: isSent ? "demo" : null,
-      paypal_invoice_id: isSent ? `DEMO-INV-${number}` : null,
+      // paypal_invoice_id is globally unique, so demo refs include a per-user suffix.
+      paypal_invoice_id: isSent ? `DEMO-INV-${number}-${db.userId.slice(0, 8)}` : null,
       paypal_status: isSent ? demoPayPalStatus(status) : null,
       paypal_recipient_url: null,
       paypal_invoicer_url: null,

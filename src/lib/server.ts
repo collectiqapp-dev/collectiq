@@ -1,11 +1,12 @@
 import "server-only";
 import path from "node:path";
 import { NextResponse, connection } from "next/server";
+import { cache } from "react";
 import { ZodError } from "zod";
 import { DEFAULT_POLICY } from "@/lib/agent/default-policy";
 import { MemoryStore } from "@/lib/db/memory-store";
 import { seedDemoData } from "@/lib/db/seed";
-import { isNotFound, type Store } from "@/lib/db/store";
+import { isNotFound, isUniqueViolation, type Store } from "@/lib/db/store";
 import { SupabaseStore } from "@/lib/db/supabase-store";
 import { UserDb } from "@/lib/db/user-db";
 import { integrationModes } from "@/lib/env";
@@ -36,23 +37,37 @@ export interface SessionUser {
   isDemo: boolean;
 }
 
+/**
+ * First-visit setup. Idempotent and race-safe: the layout and the page render
+ * concurrently, so two requests may both try to create the profile/policy.
+ */
 async function ensureUserSetup(db: UserDb, user: SessionUser): Promise<Profile> {
   let profile = await db.store.get("profiles", user.id);
   if (!profile) {
-    profile = await db.store.insert("profiles", {
-      id: user.id,
-      email: user.email,
-      full_name: user.isDemo ? "Riley Morgan (demo)" : null,
-      business_name: user.isDemo ? "Riley Morgan Design" : null,
-      default_currency: "USD",
-      autonomy_mode: "policy_driven",
-      tax_rate_percent: 0,
-      timezone: "UTC",
-      agent_paused: false,
-    });
+    try {
+      profile = await db.store.insert("profiles", {
+        id: user.id,
+        email: user.email,
+        full_name: user.isDemo ? "Riley Morgan (demo)" : null,
+        business_name: user.isDemo ? "Riley Morgan Design" : null,
+        default_currency: "USD",
+        autonomy_mode: "policy_driven",
+        tax_rate_percent: 0,
+        timezone: "UTC",
+        agent_paused: false,
+      });
+    } catch (e) {
+      if (!isUniqueViolation(e)) throw e;
+      profile = await db.store.get("profiles", user.id);
+      if (!profile) throw e;
+    }
   }
   if (!(await db.findOne("collection_policies", { is_default: true }))) {
-    await db.insert("collection_policies", { ...DEFAULT_POLICY, is_demo: false });
+    try {
+      await db.insert("collection_policies", { ...DEFAULT_POLICY, is_demo: false });
+    } catch (e) {
+      if (!isUniqueViolation(e)) throw e; // another request created it first
+    }
   }
   if (user.isDemo && (await db.list("clients")).length === 0) {
     await seedDemoData(db);
@@ -60,8 +75,13 @@ async function ensureUserSetup(db: UserDb, user: SessionUser): Promise<Profile> 
   return profile;
 }
 
-/** Resolve the current user and a scoped service context, or null if signed out. */
-export async function getSession(): Promise<{ user: SessionUser; ctx: ServiceContext; profile: Profile } | null> {
+/**
+ * Resolve the current user and a scoped service context, or null if signed out.
+ * Wrapped in React `cache` so the layout and page share one lookup per request.
+ */
+export const getSession = cache(resolveSession);
+
+async function resolveSession(): Promise<{ user: SessionUser; ctx: ServiceContext; profile: Profile } | null> {
   await connection(); // always per-request: never prerender user data
   const modes = integrationModes();
   let user: SessionUser;
