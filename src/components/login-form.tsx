@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, Field, Input } from "@/components/ui/primitives";
 import { apiFetch } from "@/components/use-api";
 
-export function LoginForm({ initialMode = "login" }: { initialMode?: "login" | "signup" }) {
+export function LoginForm({ initialMode = "login", embedded = false, onModeChange }: { initialMode?: "login" | "signup"; embedded?: boolean; onModeChange?: (m: "login" | "signup") => void }) {
   const router = useRouter();
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
   const [email, setEmail] = useState("");
@@ -41,7 +41,7 @@ export function LoginForm({ initialMode = "login" }: { initialMode?: "login" | "
   };
 
   return (
-    <Card className="p-5">
+    <Card className={embedded ? "border-0 bg-transparent p-4 shadow-none" : "p-5"}>
       <form onSubmit={submit} className="grid gap-3">
         <Field label="Email" htmlFor="email">
           <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -58,7 +58,7 @@ export function LoginForm({ initialMode = "login" }: { initialMode?: "login" | "
         <Button type="submit" disabled={busy}>
           {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
         </Button>
-        <button type="button" className="text-xs text-muted-foreground hover:text-foreground" onClick={() => setMode(mode === "login" ? "signup" : "login")}>
+        <button type="button" className="text-xs text-muted-foreground hover:text-foreground" onClick={() => { const next = mode === "login" ? "signup" : "login"; if (onModeChange) onModeChange(next); else setMode(next); }}>
           {mode === "login" ? "New here? Create an account" : "Have an account? Sign in"}
         </button>
       </form>

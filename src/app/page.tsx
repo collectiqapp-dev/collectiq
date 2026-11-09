@@ -18,6 +18,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { FullLogo, LogoMark } from "@/components/brand";
+import { AuthTrigger, HeroAuthPanel } from "@/components/landing/hero-auth";
 import { CountUp, Reveal } from "@/components/landing/reveal";
 import { integrationModes } from "@/lib/env";
 import { supabaseForRequest } from "@/lib/supabase/server";
@@ -66,72 +67,29 @@ const STEPS = [
   { icon: HandCoins, title: "Get paid, see it all", body: "Verified PayPal payments flip invoices to Paid. Dashboards show what's due, overdue and coming in." },
 ];
 
-export default async function LandingPage() {
-  const state = await viewerState();
+/** Signed-out visitors open the in-hero auth panel; everyone else navigates. */
+function Cta({ signedOut, href, className, children, mode = "signup" }: { signedOut: boolean; href: string; className: string; children: React.ReactNode; mode?: "login" | "signup" }) {
+  return signedOut ? (
+    <AuthTrigger mode={mode} className={className}>
+      {children}
+    </AuthTrigger>
+  ) : (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+export default async function LandingPage() {  const state = await viewerState();
   const primary =
     state === "signed-in"
       ? { href: "/overview", label: "Open dashboard" }
       : state === "demo"
         ? { href: "/overview", label: "Open the live demo" }
-        : { href: "/login?mode=signup", label: "Create free account" };
+        : { href: "/?auth=signup", label: "Create free account" };
+  const signedOut = state === "signed-out";
 
-  return (
-    <div className="dark min-h-dvh bg-[#0B1220] text-[#E5E7EB]">
-      {/* Nav */}
-      <header className="sticky top-0 z-30 border-b border-white/5 bg-[#0B1220]/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-          <Link href="/" aria-label="COLLECTIQ home" className="w-32 shrink-0 sm:w-48">
-            <FullLogo onDark />
-          </Link>
-          <nav className="ml-auto hidden items-center gap-6 text-sm text-[#94A3B8] md:flex" aria-label="Sections">
-            <a href="#problem" className="hover:text-white">What we solve</a>
-            <a href="#how" className="hover:text-white">What we do</a>
-            <a href="#trust" className="hover:text-white">Safety</a>
-          </nav>
-          <div className="ml-auto flex items-center gap-2 md:ml-6">
-            {state === "signed-out" && (
-              <Link href="/login" className="whitespace-nowrap rounded-[10px] px-2.5 py-2 text-sm font-medium text-[#E5E7EB] hover:bg-white/5">
-                Sign in
-              </Link>
-            )}
-            <Link href={primary.href} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-[10px] bg-[#10B981] px-3 py-2 text-sm font-semibold text-[#04120c] hover:bg-[#10D69A]">
-              <span className="hidden sm:inline">{primary.label}</span>
-              <span className="sm:hidden">{state === "signed-out" ? "Get started" : "Open"}</span>
-              <ArrowRight className="size-4" />
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div aria-hidden className="ciq-glow pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(16,185,129,0.35),transparent)]" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-16 pt-14 sm:px-6 lg:grid-cols-2 lg:pt-20">
-          <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#10B981]/30 bg-[#10B981]/10 px-3 py-1 text-xs font-medium text-[#34D399]">
-              <Sparkles className="size-3.5" /> AI collections agent · built on PayPal + Claude
-            </span>
-            <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
-              Do the work.
-              <br />
-              <span className="bg-gradient-to-r from-[#10D69A] to-[#3B82F6] bg-clip-text text-transparent">Let your agent get you paid.</span>
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-[#94A3B8] sm:text-lg">
-              COLLECTIQ creates your invoices, sends them through PayPal, and follows up on schedule until you&apos;re paid, always within the rules you set and with every action logged.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href={primary.href} className="ciq-pulse inline-flex items-center gap-2 rounded-[12px] bg-[#10B981] px-5 py-3 text-sm font-semibold text-[#04120c] hover:bg-[#10D69A]">
-                {primary.label} <ArrowRight className="size-4" />
-              </Link>
-              <a href="#how" className="inline-flex items-center gap-2 rounded-[12px] border border-white/10 px-5 py-3 text-sm font-medium text-[#E5E7EB] hover:bg-white/5">
-                See how it works
-              </a>
-            </div>
-            <p className="mt-4 text-xs text-[#64748B]">For freelancers, consultants and creative studios.</p>
-          </Reveal>
-
-          {/* Animated product preview */}
-          <Reveal delay={150}>
+  const preview = (
             <div className="ciq-float relative mx-auto w-full max-w-md">
               <div className="rounded-[18px] border border-white/10 bg-[#111827]/90 p-4 shadow-2xl shadow-black/50">
                 <div className="flex items-center gap-2 border-b border-white/5 pb-3">
@@ -165,6 +123,66 @@ export default async function LandingPage() {
                 </p>
               </div>
             </div>
+  );
+
+  return (
+    <div className="dark min-h-dvh bg-[#0B1220] text-[#E5E7EB]">
+      {/* Nav */}
+      <header className="sticky top-0 z-30 border-b border-white/5 bg-[#0B1220]/80 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
+          <Link href="/" aria-label="COLLECTIQ home" className="w-32 shrink-0 sm:w-48">
+            <FullLogo onDark />
+          </Link>
+          <nav className="ml-auto hidden items-center gap-6 text-sm text-[#94A3B8] md:flex" aria-label="Sections">
+            <a href="#problem" className="hover:text-white">What we solve</a>
+            <a href="#how" className="hover:text-white">What we do</a>
+            <a href="#trust" className="hover:text-white">Safety</a>
+          </nav>
+          <div className="ml-auto flex items-center gap-2 md:ml-6">
+            {state === "signed-out" && (
+              <Cta signedOut={signedOut} href={primary.href} mode="login" className="whitespace-nowrap rounded-[10px] px-2.5 py-2 text-sm font-medium text-[#E5E7EB] hover:bg-white/5">
+                Sign in
+              </Cta>
+            )}
+            <Cta signedOut={signedOut} href={primary.href} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-[10px] bg-[#10B981] px-3 py-2 text-sm font-semibold text-[#04120c] hover:bg-[#10D69A]">
+              <span className="hidden sm:inline">{primary.label}</span>
+              <span className="sm:hidden">{signedOut ? "Get started" : "Open"}</span>
+              <ArrowRight className="size-4" />
+            </Cta>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div aria-hidden className="ciq-glow pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(16,185,129,0.35),transparent)]" />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-16 pt-14 sm:px-6 lg:grid-cols-2 lg:pt-20">
+          <Reveal>
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#10B981]/30 bg-[#10B981]/10 px-3 py-1 text-xs font-medium text-[#34D399]">
+              <Sparkles className="size-3.5" /> AI collections agent · built on PayPal + Claude
+            </span>
+            <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
+              Do the work.
+              <br />
+              <span className="bg-gradient-to-r from-[#10D69A] to-[#3B82F6] bg-clip-text text-transparent">Let your agent get you paid.</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-[#94A3B8] sm:text-lg">
+              COLLECTIQ creates your invoices, sends them through PayPal, and follows up on schedule until you&apos;re paid, always within the rules you set and with every action logged.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Cta signedOut={signedOut} href={primary.href} className="ciq-pulse inline-flex items-center gap-2 rounded-[12px] bg-[#10B981] px-5 py-3 text-sm font-semibold text-[#04120c] hover:bg-[#10D69A]">
+                {primary.label} <ArrowRight className="size-4" />
+              </Cta>
+              <a href="#how" className="inline-flex items-center gap-2 rounded-[12px] border border-white/10 px-5 py-3 text-sm font-medium text-[#E5E7EB] hover:bg-white/5">
+                See how it works
+              </a>
+            </div>
+            <p className="mt-4 text-xs text-[#64748B]">For freelancers, consultants and creative studios.</p>
+          </Reveal>
+
+          {/* Animated product preview */}
+          <Reveal delay={150}>
+            {signedOut ? <HeroAuthPanel preview={preview} /> : preview}
           </Reveal>
         </div>
       </section>
@@ -271,13 +289,13 @@ export default async function LandingPage() {
           <h2 className="mt-5 text-3xl font-bold tracking-tight text-white sm:text-4xl">Spend your time on the work, not the chasing.</h2>
           <p className="mt-3 text-[#94A3B8]">Connect PayPal, set your collection style, and let your agent take it from there.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href={primary.href} className="inline-flex items-center gap-2 rounded-[12px] bg-[#10B981] px-5 py-3 text-sm font-semibold text-[#04120c] hover:bg-[#10D69A]">
+            <Cta signedOut={signedOut} href={primary.href} className="inline-flex items-center gap-2 rounded-[12px] bg-[#10B981] px-5 py-3 text-sm font-semibold text-[#04120c] hover:bg-[#10D69A]">
               {primary.label} <ArrowRight className="size-4" />
-            </Link>
-            {state === "signed-out" && (
-              <Link href="/login" className="rounded-[12px] border border-white/10 px-5 py-3 text-sm font-medium hover:bg-white/5">
+            </Cta>
+            {signedOut && (
+              <Cta signedOut={signedOut} href={primary.href} mode="login" className="rounded-[12px] border border-white/10 px-5 py-3 text-sm font-medium hover:bg-white/5">
                 Sign in
-              </Link>
+              </Cta>
             )}
           </div>
         </Reveal>
