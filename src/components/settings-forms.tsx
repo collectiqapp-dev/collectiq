@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 export function ProfileForm({ profile }: { profile: Profile }) {
   const [f, setF] = useState({
     full_name: profile.full_name ?? "",
-    business_name: profile.business_name ?? "",
     default_currency: profile.default_currency,
     tax_rate_percent: String(profile.tax_rate_percent),
   });
@@ -32,9 +31,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       <Field label="Your name" htmlFor="fn">
         <Input id="fn" value={f.full_name} onChange={(e) => setF({ ...f, full_name: e.target.value })} maxLength={120} />
       </Field>
-      <Field label="Business name" htmlFor="bn">
-        <Input id="bn" value={f.business_name} onChange={(e) => setF({ ...f, business_name: e.target.value })} maxLength={120} />
-      </Field>
+
       <Field label="Reporting currency" htmlFor="dc" hint="Dashboard totals use this currency. Other currencies are not converted.">
         <Select id="dc" value={f.default_currency} onChange={(e) => setF({ ...f, default_currency: e.target.value as Profile["default_currency"] })}>
           {CURRENCIES.map((c) => (
@@ -149,5 +146,25 @@ export function DemoDataControls({ dataMode }: { dataMode: string }) {
         </Dialog>
       )}
     </div>
+  );
+}
+
+export function RestartTourButton({ userId }: { userId: string }) {
+  const router = useRouter();
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={async () => {
+        try {
+          localStorage.removeItem(`ciq-tour-done-${userId}`);
+        } catch {}
+        await fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tour_completed: false }) }).catch(() => {});
+        router.push("/");
+        router.refresh();
+      }}
+    >
+      Restart tour
+    </Button>
   );
 }

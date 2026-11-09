@@ -14,6 +14,7 @@ const invoice = (over: Partial<Invoice> = {}): Invoice =>
     total_cents: 50000,
     amount_paid_cents: 0,
     policy_id: "p1",
+    paypal_invoice_id: "INV2-TEST",
     ...over,
   }) as Invoice;
 const task = (over: Partial<AgentTask>): AgentTask =>

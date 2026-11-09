@@ -83,6 +83,12 @@ export const settingsSchema = z.object({
   autonomy_mode: z.enum(["assisted", "policy_driven", "adaptive"]).optional(),
   tax_rate_percent: z.coerce.number().min(0).max(50).optional(),
   agent_paused: z.boolean().optional(),
+  business_website: z.string().trim().max(300).optional().nullable(),
+  business_description: z.string().trim().max(1000).optional().nullable(),
+  business_email: z.union([z.email(), z.literal("")]).optional().nullable(),
+  business_phone: z.string().trim().max(60).optional().nullable(),
+  business_address: z.string().trim().max(300).optional().nullable(),
+  tour_completed: z.boolean().optional(),
 });
 
 export const chatInputSchema = z.object({

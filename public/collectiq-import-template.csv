@@ -1,0 +1,4 @@
+client_name,client_email,company,phone,currency,invoice_number,project,description,quantity,unit_amount,issue_date,due_date,status,amount_paid
+Sarah Chen,sarah@bloomstudio.example,Bloom Studio,,USD,INV-2001,Brand refresh,Logo and guidelines,1,1500,2026-10-01,2026-10-15,sent,
+Alex Rivera,alex@northwind.example,Northwind Labs,,USD,INV-2002,Dashboard redesign,UX audit,1,900,2026-10-20,2026-11-03,partially_paid,400
+Maya Patel,maya@lumen.example,Lumen Coffee,+1 628 555 0199,USD,,,,,,,,,

@@ -1,21 +1,27 @@
+/* eslint-disable @next/next/no-img-element -- static brand SVGs, no optimisation needed */
 import { cn } from "@/lib/utils";
 
-/** Brand mark: emerald rounded "C" enclosing a checkmark. */
+/** Official COLLECTIQ C-check symbol (public/collectiq-symbol.svg). */
 export function LogoMark({ className }: { className?: string }) {
+  return <img src="/collectiq-symbol.svg" alt="COLLECTIQ" className={cn("size-8 shrink-0", className)} />;
+}
+
+/** Wordmark: COLLECT + emerald IQ, for places where the full logo image doesn't fit. */
+export function Wordmark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 40 40" className={cn("size-8 shrink-0", className)} role="img" aria-label="COLLECTIQ">
-      <rect width="40" height="40" rx="11" fill="#10B981" />
-      <path d="M28.5 12.6A11 11 0 1 0 28.5 27.4" fill="none" stroke="#0B1220" strokeWidth="4" strokeLinecap="round" />
-      <path d="M14.5 20.2l3.6 3.6 7.4-7.6" fill="none" stroke="#0B1220" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <span className={cn("font-bold tracking-tight", className)}>
+      COLLECT<span className="text-[#10B981]">IQ</span>
+    </span>
   );
 }
 
-/** Wordmark: COLLECT + emerald IQ. */
-export function Wordmark({ className }: { className?: string }) {
+/** Full logo with tagline; `onDark` uses the light-text variant. */
+export function FullLogo({ onDark = false, className }: { onDark?: boolean; className?: string }) {
   return (
-    <span className={cn("font-bold tracking-wide", className)}>
-      COLLECT<span className="text-[#10B981]">IQ</span>
-    </span>
+    <img
+      src={onDark ? "/collectiq-logo-dark.svg" : "/collectiq-logo.svg"}
+      alt="COLLECTIQ: Do the work. Let your agent get you paid."
+      className={cn("h-auto w-full", className)}
+    />
   );
 }

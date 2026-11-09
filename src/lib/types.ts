@@ -30,6 +30,13 @@ export interface Profile {
   tax_rate_percent: number;
   timezone: string;
   agent_paused: boolean;
+  // Added in migration 20261109120000 (optional so older databases keep working).
+  business_website?: string | null;
+  business_description?: string | null;
+  business_email?: string | null;
+  business_phone?: string | null;
+  business_address?: string | null;
+  tour_completed_at?: string | null;
   created_at: string;
   updated_at: string;
 }

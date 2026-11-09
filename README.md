@@ -17,7 +17,8 @@ Built for the PayPal AI Hackathon 2026.
 | **Clients** | Directory with invoiced/collected/outstanding/overdue, payment and communication history, pause reminders, record disputes. |
 | **Agent Activity** | Audit log: trigger, observed condition, reasoning, proposed action, permission check, approval, execution status, PayPal reference, errors. |
 | **Insights** | Monthly collections, aging, client contribution, upcoming due dates and an AI briefing grounded only in computed figures. |
-| **Settings** | Autonomy mode (Assisted / Policy-driven / Adaptive), emergency agent pause, integration status and a live PayPal connection test. |
+| **Settings** | Business details auto-filled from your website URL, Excel/CSV import of clients and invoices (with preview and validation), autonomy mode (Assisted / Policy-driven / Adaptive), emergency agent pause, light/dark theme, guided-tour replay, integration status and a live PayPal connection test. |
+| **Onboarding** | A first-login guided tour with tooltips over the key features. |
 
 ## Quick start (demo mode, no credentials needed)
 
@@ -41,7 +42,7 @@ A yellow banner at the top of every page shows which integrations are in demo mo
 1. `cp .env.example .env.local` and fill in the values below.
 2. **PayPal Sandbox**: create a REST app at https://developer.paypal.com/dashboard/applications/sandbox. Set `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_BASE_URL=https://api-m.sandbox.paypal.com`. In Settings, press **Test PayPal connection**.
 3. **PayPal webhooks**: in the same app, add a webhook to `https://<your-host>/api/webhooks/paypal` for `INVOICING.INVOICE.CREATED`, `.SENT`, `.PAID`, `.PARTIALLY_PAID`, `.CANCELLED`, `.REFUNDED`, `.UPDATED` (and `.SCHEDULED`). Put its ID in `PAYPAL_WEBHOOK_ID`. For local testing expose your dev server with a tunnel (e.g. `ngrok http 3000`).
-4. **Supabase**: create a project, run `supabase/migrations/20261109000000_initial_schema.sql` (SQL editor or `supabase db push`), then set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. Users sign up on `/login`; demo data can be loaded per account from Settings.
+4. **Supabase**: create a project, run both files in `supabase/migrations/` in order (`20261109000000_initial_schema.sql`, then `20261109120000_business_profile_and_onboarding.sql`) in the SQL editor or with `supabase db push`, then set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. Users sign up on `/login`; demo data can be loaded per account from Settings.
 5. **Claude**: set `ANTHROPIC_API_KEY` (optionally `ANTHROPIC_MODEL`, default `claude-sonnet-5-5`).
 6. **Scheduler**: set `CRON_SECRET` and call `POST /api/cron/run-collections` with `Authorization: Bearer $CRON_SECRET` on a schedule.
 

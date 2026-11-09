@@ -23,6 +23,7 @@ import { useTheme } from "next-themes";
 import { DropdownMenu } from "radix-ui";
 import { useEffect, useRef, useState } from "react";
 import { LogoMark, Wordmark } from "@/components/brand";
+import { OnboardingTour } from "@/components/onboarding-tour";
 import { Badge } from "@/components/ui/primitives";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,8 @@ export interface ShellProps {
   modes: { paypal: string; data: string; ai: string };
   approvals: Array<{ id: string; summary: string; kind: string }>;
   manualReviews: number;
+  showTour: boolean;
+  userId: string;
   children: React.ReactNode;
 }
 
@@ -56,7 +59,8 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     </div>
   );
 }
-export function AppShell({ user, modes, approvals, manualReviews, children }: ShellProps) {
+export function AppShell({ user, modes, approvals, manualReviews, showTour, userId, children }: ShellProps) {
+  const [tourOpen, setTourOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
@@ -68,6 +72,11 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
 
   useEffect(() => {
     setMounted(true);
+    let seen = false;
+    try {
+      seen = localStorage.getItem(`ciq-tour-done-${userId}`) === "1";
+    } catch {}
+    if (showTour && !seen) setTourOpen(true);
 
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -77,7 +86,7 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [showTour, userId]);
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
@@ -91,6 +100,7 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
         <Link
           key={href}
           href={href}
+          data-tour={`nav-${href}`}
           title={isCollapsed ? label : undefined}
           aria-current={isActive(href) ? "page" : undefined}
           className={cn(
@@ -164,6 +174,7 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
             <Menu className="size-5" />
           </button>
           <form
+            data-tour="ask"
             className="relative flex max-w-xl flex-1"
             onSubmit={(e) => {
               e.preventDefault();
@@ -194,7 +205,7 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
             </button>
 
             <DropdownMenu.Root>
-              <DropdownMenu.Trigger className="relative rounded-[10px] p-2 hover:bg-muted" aria-label={`Notifications (${notifCount})`}>
+              <DropdownMenu.Trigger data-tour="notifications" className="relative rounded-[10px] p-2 hover:bg-muted" aria-label={`Notifications (${notifCount})`}>
                 <Bell className="size-4" />
                 {notifCount > 0 && <span className="absolute right-1 top-1 grid size-4 place-items-center rounded-full bg-amber-500 text-[9px] font-bold text-slate-950">{notifCount}</span>}
               </DropdownMenu.Trigger>
@@ -263,6 +274,16 @@ export function AppShell({ user, modes, approvals, manualReviews, children }: Sh
             </DropdownMenu.Root>
           </div>
         </header>
+        <OnboardingTour
+          open={tourOpen}
+          onClose={() => {
+            setTourOpen(false);
+            try {
+              localStorage.setItem(`ciq-tour-done-${userId}`, "1");
+            } catch {}
+            void fetch("/api/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tour_completed: true }) }).catch(() => {});
+          }}
+        />
         <main className="w-full flex-1 px-4 py-4 md:px-5 md:py-5 2xl:px-6">{children}</main>
       </div>
     </div>

@@ -47,6 +47,7 @@ export function evaluateInvoice(input: {
   }
   if (!COLLECTIBLE.has(invoice.status)) return none(`Invoice status "${invoice.status}" is not collectible.`);
   if (invoice.amount_due_cents <= 0) return none("No outstanding balance.", true);
+  if (!invoice.paypal_invoice_id) return none("Not issued through PayPal, so PayPal reminders are unavailable.");
   if (!policy) return none("No collection policy assigned.");
   if (policy.status !== "active") return none(`Policy "${policy.name}" is paused.`);
 

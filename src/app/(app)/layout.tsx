@@ -22,6 +22,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       modes={{ paypal: modes.paypal, data: modes.data, ai: modes.ai }}
       approvals={approvals.map((a) => ({ id: a.id, summary: a.summary, kind: a.kind }))}
       manualReviews={reviews.size}
+      showTour={!profile.tour_completed_at}
+      userId={user.id}
     >
       {children}
     </AppShell>

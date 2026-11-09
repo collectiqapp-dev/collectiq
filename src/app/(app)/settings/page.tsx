@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { AppearanceToggle } from "@/components/appearance-toggle";
-import { AutonomyForm, DemoDataControls, ProfileForm, TestPayPalButton } from "@/components/settings-forms";
+import { BusinessProfileForm } from "@/components/business-profile-form";
+import { ImportDialog } from "@/components/import-dialog";
+import { AutonomyForm, DemoDataControls, ProfileForm, RestartTourButton, TestPayPalButton } from "@/components/settings-forms";
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from "@/components/ui/primitives";
 import { env, integrationModes } from "@/lib/env";
 import { getSession } from "@/lib/server";
@@ -25,12 +27,24 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader>
             <div>
-              <CardTitle>Business profile</CardTitle>
-              <CardDescription>Used on invoices and in agent messages</CardDescription>
+              <CardTitle>Your profile</CardTitle>
+              <CardDescription>Name, reporting currency and tax rate</CardDescription>
             </div>
           </CardHeader>
           <CardContent>
             <ProfileForm profile={profile} />
+          </CardContent>
+        </Card>
+
+        <Card id="business">
+          <CardHeader>
+            <div>
+              <CardTitle>Business details</CardTitle>
+              <CardDescription>Used on invoices and in agent messages. Paste your website to fill them in automatically.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <BusinessProfileForm profile={profile} />
           </CardContent>
         </Card>
 
@@ -43,6 +57,13 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent>
             <AppearanceToggle />
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-[12px] border border-border p-3">
+              <span>
+                <span className="block text-sm font-medium">Guided tour</span>
+                <span className="block text-xs text-muted-foreground">Replay the walkthrough of COLLECTIQ&apos;s main features.</span>
+              </span>
+              <RestartTourButton userId={session.user.id} />
+            </div>
           </CardContent>
         </Card>
 
@@ -118,12 +139,15 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader>
             <div>
-              <CardTitle>Demo data</CardTitle>
-              <CardDescription>Fictional clients and invoices, all marked as demo, so you can try every workflow. Demo invoices never reach PayPal.</CardDescription>
+              <CardTitle>Your data</CardTitle>
+              <CardDescription>Import your existing clients and invoices from Excel or CSV, or load fictional demo data (marked Demo, never sent to PayPal) to try every workflow.</CardDescription>
             </div>
           </CardHeader>
           <CardContent>
-            <DemoDataControls dataMode={m.data} />
+            <div className="flex flex-wrap gap-2">
+              <ImportDialog />
+              <DemoDataControls dataMode={m.data} />
+            </div>
           </CardContent>
         </Card>
       </div>
