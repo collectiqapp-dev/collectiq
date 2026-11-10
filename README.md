@@ -48,6 +48,19 @@ A yellow banner at the top of every page shows which integrations are in demo mo
 
 ### Test credentials for judges
 
+**Live demo:** https://collectiq-phi.vercel.app (PayPal Sandbox, Claude and Supabase all connected)
+
+| What | Login | Password |
+|---|---|---|
+| COLLECTIQ judge account (pre-loaded demo data) | `collectiq.judge@gmail.com` | `test1234` |
+| PayPal Sandbox buyer (to pay an invoice) | `sb-4visu53811690@personal.example.com` | `f<8jBOhp` |
+
+Suggested 3-minute judge path:
+1. Sign in, open **AI Command Center** and ask: *"Create an invoice for Jamie Buyer for $25 for a logo tweak, due in 7 days"*. Approve the draft.
+2. Open the invoice and **Send via PayPal**. The PayPal invoice ID and client payment link appear once PayPal confirms.
+3. Open the **Client payment page**, log in as the sandbox buyer above and pay. The verified PayPal webhook flips the invoice to **Paid** and the Agent Activity log shows each step.
+4. Visit **Autopilot → Run collection cycle now** and **Agent Activity** to see policy-driven reminders and the audit trail.
+
 Sandbox buyer accounts are created in the PayPal developer dashboard under **Testing tools → Sandbox accounts**. To see a payment flow end-to-end: send an invoice to the sandbox **personal** account's email, open the client payment link shown on the invoice page, log in as that sandbox buyer and pay. The verified webhook flips the invoice to Paid and stops all reminders.
 
 Sandbox accounts used for development (PayPal Sandbox only, no real money):
