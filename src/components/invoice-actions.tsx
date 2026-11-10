@@ -18,7 +18,6 @@ export function InvoiceActions({
   sendMode,
   dueLabel,
   clientEmail,
-  sendBlockedReason,
 }: {
   id: string;
   status: InvoiceStatus;
@@ -29,8 +28,6 @@ export function InvoiceActions({
   sendMode: PayPalMode;
   dueLabel: string;
   clientEmail: string;
-  /** Set when PayPal cannot take this invoice (e.g. unsupported currency). */
-  sendBlockedReason?: string | null;
 }) {
   const { run, pending } = useApi();
   const [tone, setTone] = useState("friendly");
@@ -56,13 +53,7 @@ export function InvoiceActions({
         </Button>
       )}
 
-      {status === "draft" && sendBlockedReason && (
-        <div className="flex max-w-sm items-center gap-2 rounded-[10px] border border-warning/40 bg-warning-soft px-3 py-2 text-xs text-warning" role="note">
-          <Send className="size-4 shrink-0" /> {sendBlockedReason}
-        </div>
-      )}
-
-      {status === "draft" && !sendBlockedReason && (
+      {status === "draft" && (
         <Dialog open={open === "send"} onOpenChange={(o) => setOpen(o ? "send" : null)}>
           <DialogTrigger asChild>
             <Button>

@@ -4,7 +4,6 @@ import { computeSummary, effectiveStatus, factualSummary } from "@/lib/metrics";
 import { formatMoney } from "@/lib/money";
 import { createApproval } from "@/lib/services/approvals";
 import type { ServiceContext } from "@/lib/services/context";
-import { paypalInvoiceCurrencyAllowed } from "@/lib/services/invoices";
 import type { Approval, Client, Invoice } from "@/lib/types";
 import { CURRENCIES } from "@/lib/types";
 
@@ -271,9 +270,6 @@ export async function executeTool(ctx: ServiceContext, name: string, rawInput: u
       const inv = await ctx.db.get("invoices", String(input.invoice_id ?? ""));
       if (!inv) return err("Invoice not found.");
       if (inv.status !== "draft") return err(`Invoice ${inv.invoice_number} is ${inv.status}; only drafts can be sent.`);
-      if (!paypalInvoiceCurrencyAllowed(inv.currency) && ctx.gateways.forInvoice(inv).mode !== "demo") {
-        return err(`PayPal can't invoice in ${inv.currency} for this account, so ${inv.invoice_number} can't be sent through PayPal. Tell the user to use USD for PayPal invoices.`);
-      }
       const client = clientMap.get(inv.client_id);
       const approval = await createApproval(ctx, {
         kind: "send_invoice",

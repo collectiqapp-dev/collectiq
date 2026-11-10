@@ -40,35 +40,10 @@ const INVOICES: SeedInvoice[] = [
   { client: "maya", project: "Menu and packaging design", items: [["Seasonal poster", 1, 300]], issueOffset: -35, dueOffset: -21, status: "cancelled" },
 ];
 
-/** Rough per-currency scale so fictional amounts look realistic (e.g. $1,500 → ₹1,20,000). Demo only. */
-const DEMO_SCALE: Record<Currency, number> = { USD: 1, EUR: 1, GBP: 1, CAD: 1.5, AUD: 1.5, INR: 80 };
-
-/** Delete demo rows (is_demo) so they can be re-seeded, e.g. in a new currency. Real data is untouched. */
-export async function removeDemoData(db: UserDb) {
-  const demoInvoices = await db.list("invoices", { is_demo: true });
-  for (const inv of demoInvoices) {
-    for (const it of await db.list("invoice_items", { invoice_id: inv.id })) await db.remove("invoice_items", it.id);
-    await db.remove("invoices", inv.id);
-  }
-  for (const p of await db.list("projects", { is_demo: true })) await db.remove("projects", p.id);
-  let keptClients = 0;
-  for (const c of await db.list("clients", { is_demo: true })) {
-    // Keep a demo client if the user has since created real invoices for it.
-    if ((await db.list("invoices", { client_id: c.id })).length > 0) {
-      keptClients++;
-      continue;
-    }
-    await db.remove("clients", c.id);
-  }
-  return { removedInvoices: demoInvoices.length, keptClients };
-}
-
-export async function seedDemoData(db: UserDb, now = new Date(), currency?: Currency) {
+export async function seedDemoData(db: UserDb, now = new Date()) {
   const today = todayISO(now);
   const existing = await db.list("clients", { is_demo: true });
   if (existing.length > 0) return { created: false };
-  const cur: Currency = currency ?? (await db.profile()).default_currency;
-  const scale = DEMO_SCALE[cur] ?? 1;
 
   const policy =
     (await db.findOne("collection_policies", { is_default: true })) ??
@@ -82,7 +57,7 @@ export async function seedDemoData(db: UserDb, now = new Date(), currency?: Curr
       email: c.email,
       company: c.company,
       phone: c.phone,
-      currency: cur,
+      currency: "USD" as Currency,
       collection_paused: false,
       dispute_open: false,
       dispute_note: null,
@@ -104,8 +79,8 @@ export async function seedDemoData(db: UserDb, now = new Date(), currency?: Curr
       });
       projectIds[pKey] = p.id;
     }
-    const subtotal = inv.items.reduce((s, [, q, u]) => s + q * Math.round(u * scale) * 100, 0);
-    const paid = Math.round((inv.paidDollars ?? 0) * scale) * 100;
+    const subtotal = inv.items.reduce((s, [, q, u]) => s + q * u * 100, 0);
+    const paid = (inv.paidDollars ?? 0) * 100;
     const status = inv.status;
     const isSent = status !== "draft";
     const number = `DEMO-${n++}`;
@@ -114,7 +89,7 @@ export async function seedDemoData(db: UserDb, now = new Date(), currency?: Curr
       project_id: projectIds[pKey],
       policy_id: policy.id,
       invoice_number: number,
-      currency: cur,
+      currency: "USD",
       issue_date: addDays(today, inv.issueOffset),
       due_date: addDays(today, inv.dueOffset),
       status,
@@ -145,7 +120,7 @@ export async function seedDemoData(db: UserDb, now = new Date(), currency?: Curr
         invoice_id: invoice.id,
         description,
         quantity,
-        unit_amount_cents: Math.round(unit * scale) * 100,
+        unit_amount_cents: unit * 100,
         position: pos++,
       });
     }
@@ -174,7 +149,7 @@ export async function seedDemoData(db: UserDb, now = new Date(), currency?: Curr
         invoice_id: invoice.id,
         client_id: invoice.client_id,
         trigger: "Demo seed",
-        observed_condition: `Demo fixture recorded ${(paid / 100).toFixed(2)} ${cur} paid`,
+        observed_condition: `Demo fixture recorded ${paid / 100} USD paid`,
         reasoning: null,
         proposed_action: null,
         permission_result: "not_applicable",

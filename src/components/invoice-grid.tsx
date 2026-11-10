@@ -48,7 +48,7 @@ const theme = themeQuartz.withParams({
 });
 
 const money = (cents: number, currency: string) =>
-  new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", { style: "currency", currency }).format(cents / 100);
+  new Intl.NumberFormat("en-US", { style: "currency", currency }).format(cents / 100);
 const date = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
 function NumberCell(p: CustomCellRendererProps<InvoiceRow>) {
