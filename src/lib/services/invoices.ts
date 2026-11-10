@@ -17,6 +17,18 @@ function paypalErrorMessage(e: unknown) {
   return (e as Error).message ?? String(e);
 }
 
+/**
+ * Currencies PayPal Invoicing rejects for this deployment's merchant account.
+ * Verified 2026-11-10: the US sandbox merchant gets "Currency Code is not valid"
+ * for INR (PayPal supports INR only for India accounts, which lack Invoicing).
+ * Override with PAYPAL_UNSUPPORTED_CURRENCIES (comma-separated, empty = none).
+ */
+export function paypalInvoiceCurrencyAllowed(currency: string): boolean {
+  const raw = process.env.PAYPAL_UNSUPPORTED_CURRENCIES;
+  const blocked = (raw === undefined ? "INR" : raw).split(",").map((s) => s.trim().toUpperCase()).filter(Boolean);
+  return !blocked.includes(currency.toUpperCase());
+}
+
 async function defaultPolicy(ctx: ServiceContext): Promise<CollectionPolicy | null> {
   return ctx.db.findOne("collection_policies", { is_default: true });
 }
@@ -189,6 +201,14 @@ export async function sendInvoice(
   }
 
   const gateway = ctx.gateways.forInvoice(invoice);
+  if (gateway.mode !== "demo" && !paypalInvoiceCurrencyAllowed(invoice.currency)) {
+    // Checked before any PayPal call so nothing is half-created.
+    throw new ServiceError(
+      `PayPal can't create ${invoice.currency} invoices for this merchant account (PayPal supports ${invoice.currency} only for in-country accounts). Use a currency PayPal accepts, such as USD, for invoices sent through PayPal.`,
+      422,
+      "currency_not_supported_by_paypal",
+    );
+  }
   const items: InvoiceItem[] = await ctx.db.list("invoice_items", { invoice_id: id });
   try {
     if (!invoice.paypal_invoice_id) {

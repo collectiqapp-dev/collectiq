@@ -11,7 +11,7 @@ export function fromCents(cents: number): string {
 }
 
 export function formatMoney(cents: number, currency = "USD"): string {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
     style: "currency",
     currency,
     minimumFractionDigits: 2,
@@ -19,7 +19,7 @@ export function formatMoney(cents: number, currency = "USD"): string {
 }
 
 export function formatCompactMoney(cents: number, currency = "USD"): string {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
     style: "currency",
     currency,
     notation: cents >= 1_000_000 ? "compact" : "standard",

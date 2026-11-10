@@ -16,7 +16,8 @@ function Status({ ok, okText, noText }: { ok: boolean; okText: string; noText: s
 export default async function SettingsPage() {
   const session = await getSession();
   if (!session) return null;
-  const { profile } = session;
+  const { profile, ctx } = session;
+  const demoCurrency = (await ctx.db.findOne("invoices", { is_demo: true }))?.currency ?? null;
   const m = integrationModes();
   const base = env.appUrl.replace(/\/$/, "");
 
@@ -146,7 +147,7 @@ export default async function SettingsPage() {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               <ImportDialog />
-              <DemoDataControls dataMode={m.data} />
+              <DemoDataControls dataMode={m.data} demoCurrency={demoCurrency} reportingCurrency={profile.default_currency} />
             </div>
           </CardContent>
         </Card>

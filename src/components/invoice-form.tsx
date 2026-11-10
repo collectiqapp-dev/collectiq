@@ -79,7 +79,7 @@ export function InvoiceForm({
     [v.items],
   );
   const tax = Math.round((subtotal * taxRate) / 100);
-  const money = (c: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: v.currency }).format(c / 100);
+  const money = (c: number) => new Intl.NumberFormat(v.currency === "INR" ? "en-IN" : "en-US", { style: "currency", currency: v.currency }).format(c / 100);
   const set = <K extends keyof InvoiceFormValues>(k: K, val: InvoiceFormValues[K]) => setV((p) => ({ ...p, [k]: val }));
   const setItem = (i: number, k: "description" | "quantity" | "unit_amount", val: string) =>
     setV((p) => ({ ...p, items: p.items.map((it, j) => (j === i ? { ...it, [k]: val } : it)) }));

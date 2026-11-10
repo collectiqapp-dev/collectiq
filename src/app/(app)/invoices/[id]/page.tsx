@@ -13,6 +13,7 @@ import { integrationModes } from "@/lib/env";
 import { effectiveStatus } from "@/lib/metrics";
 import { formatMoney } from "@/lib/money";
 import { getSession } from "@/lib/server";
+import { paypalInvoiceCurrencyAllowed } from "@/lib/services/invoices";
 
 export const metadata: Metadata = { title: "Invoice" };
 
@@ -78,6 +79,11 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           sendMode={sendMode}
           dueLabel={m(invoice.amount_due_cents)}
           clientEmail={client?.email ?? ""}
+          sendBlockedReason={
+            sendMode !== "demo" && !paypalInvoiceCurrencyAllowed(invoice.currency)
+              ? `PayPal can't invoice in ${invoice.currency} for this account, so this draft can't be sent through PayPal. Use USD for PayPal invoices.`
+              : null
+          }
         />
       </div>
 

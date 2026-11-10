@@ -108,7 +108,7 @@ export function TestPayPalButton({ configured }: { configured: boolean }) {
   );
 }
 
-export function DemoDataControls({ dataMode }: { dataMode: string }) {
+export function DemoDataControls({ dataMode, demoCurrency, reportingCurrency }: { dataMode: string; demoCurrency: string | null; reportingCurrency: string }) {
   const { run, pending } = useApi();
   const router = useRouter();
   return (
@@ -116,6 +116,16 @@ export function DemoDataControls({ dataMode }: { dataMode: string }) {
       <Button variant="outline" size="sm" disabled={pending !== null} onClick={() => run<{ message: string }>("seed", "/api/demo/seed", {}).then((r) => r && toast.success(r.message))}>
         <Database /> Load demo data
       </Button>
+      {demoCurrency && demoCurrency !== reportingCurrency && (
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={pending !== null}
+          onClick={() => run<{ message: string }>("reseed", "/api/demo/seed", { replace: true }).then((r) => r && toast.success(r.message))}
+        >
+          <RotateCcw /> Reload demo data in {reportingCurrency}
+        </Button>
+      )}
       {dataMode === "demo" && (
         <Dialog>
           <DialogTrigger asChild>
