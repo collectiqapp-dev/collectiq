@@ -74,6 +74,8 @@ Sandbox accounts used for development (PayPal Sandbox only, no real money):
 
 Verified on 2026-11-09 against the PayPal Sandbox: connection test, invoice create + send (`INV2-QGDY-CTJX-47RJ-TL2B`, status `SENT`, recipient and invoicer URLs returned), reminder, canonical status refresh, and duplicate-reminder prevention.
 
+Verified end-to-end on the live deployment on 2026-11-10: AI-drafted invoice approved, sent via PayPal Sandbox (`INV2-YP4W-GJEE-7X2Y-TRE5`), paid by the sandbox buyer, and flipped to **Paid** automatically by three verified PayPal webhooks (canonical status re-read from PayPal, $0.00 balance confirmed).
+
 ## Scripts
 
 | Command | Purpose |
